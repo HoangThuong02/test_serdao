@@ -1,0 +1,68 @@
+# Node modules
+node_modules/
+*.log
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Metro bundler
+.expo/
+dist/
+.expo-shared/
+
+# MacOS
+.DS_Store
+
+# Watchman
+.watchmanconfig
+
+# Android
+android/.gradle/
+android/app/build/
+android/.idea/
+android/local.properties
+android/app/src/main/assets/index.android.bundle
+android/app/src/main/assets/sourcemaps/
+android/app/src/main/assets/index.android.bundle.map
+
+# iOS
+ios/Pods/
+ios/build/
+ios/.DS_Store
+ios/.idea/
+ios/.vscode/
+ios/*.xcodeproj/xcuserdata/
+ios/*.xcodeproj/project.xcworkspace/
+
+# React Native
+*.log
+*.keystore
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.ipa
+*.apk
+
+# IntelliJ/IDEA
+.idea/
+*.iml
+
+# Visual Studio Code
+.vscode/
+
+# Test outputs
+coverage/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+
+# Debug
+debug/
