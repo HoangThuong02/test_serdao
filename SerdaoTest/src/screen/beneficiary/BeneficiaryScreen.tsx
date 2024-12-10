@@ -1,6 +1,7 @@
 import { Alert, StyleSheet, Text, TextInput, View, Button, ToastAndroid } from 'react-native';
 import React, { useState } from 'react';
 import IBAN from 'iban';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface Props {
     navigation: any;
@@ -12,6 +13,8 @@ const BeneficiaryScreen = (props: Props) => {
     const [iban, setIban] = useState('');
     const [ibanValid, setIbanValid] = useState<boolean | null>(null);
 
+
+    // Format IBAN 4 characters 😎
     const formatIban = (value: string) => {
         const cleanValue = value.replace(/\s/g, '');
         const formattedValue = cleanValue.match(/.{1,4}/g)?.join(' ') || '';
@@ -24,15 +27,23 @@ const BeneficiaryScreen = (props: Props) => {
         setIbanValid(IBAN.isValid(text));
     };
 
-    const handleTransaction = () => {
+    // add new beneficiary and save it 😍
+    const handleAddNew = async () => {
 
         if (!ibanValid) {
             ToastAndroid.show('Invalid IBAN. Please enter a valid one.', ToastAndroid.SHORT);
             return;
         }
 
-        ToastAndroid.show(`Add new beneficiary successfully!`, ToastAndroid.SHORT);
-        props.navigation.goBack();
+        const accountDetails = { firstName, lastName, iban };
+        try {
+            await AsyncStorage.setItem('@beneficiary', JSON.stringify(accountDetails));
+            ToastAndroid.show(` 🎉🎉 Add new beneficiary successfully 🎉🎉`, ToastAndroid.SHORT);
+            props.navigation.goBack();
+        } catch (error) {
+            ToastAndroid.show(`Error! Please try again ❗`, ToastAndroid.SHORT);
+            console.error('Error saving data', error);
+        }
     };
 
     return (
@@ -65,7 +76,7 @@ const BeneficiaryScreen = (props: Props) => {
             <Button
                 disabled={!firstName || !lastName || !iban ? true : false}
                 title="Add new beneficiary"
-                onPress={handleTransaction}
+                onPress={handleAddNew}
             />
 
         </View>

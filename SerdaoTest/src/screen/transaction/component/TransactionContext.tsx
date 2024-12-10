@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Alert } from 'react-native';
 
 interface AccountDetails {
@@ -34,17 +35,62 @@ interface TransactionProviderProps {
 
 export const TransactionProvider = ({ children }: TransactionProviderProps): JSX.Element => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [balance, setBalance] = useState<number>(1000);
+  const [balance, setBalance] = useState<number>(0);
 
-  const addTransaction = (amount: number, account: AccountDetails): void => {
+  // Get transaction & amount if exists 😁
+  useEffect(() => {
+    const loadBalance = async () => {
+      try {
+        const storedBalance = await AsyncStorage.getItem('@amount');
+        const storedTransactions = await AsyncStorage.getItem('@transactions');
+
+        if (storedTransactions) {
+          setTransactions(JSON.parse(storedTransactions));
+        }
+        if (storedBalance) {
+          setBalance(parseFloat(storedBalance));
+        } else {
+          setBalance(1000);
+          try {
+            await AsyncStorage.setItem('@amount', balance.toString());
+            console.log('Amount saved successfully');
+          } catch (error) {
+            console.error('Error saving data', error);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading balance from AsyncStorage', error);
+        setBalance(1000);
+      }
+    };
+
+    loadBalance();
+  }, []);
+
+  const addTransaction = async (amount: number, account: AccountDetails): Promise<void> => {
     if (amount <= 0 || amount > balance) {
       Alert.alert("Invalid transaction amount");
       return;
     }
+
     const newTransaction: Transaction = { id: Date.now(), amount, account };
-    setTransactions((prevTransactions) => [...prevTransactions, newTransaction]);
-    setBalance((prevBalance) => prevBalance - amount);
+    const newBalance = balance - amount;
+    const newTransactions = [...transactions, newTransaction];
+
+    // Save transaction & amount 💋
+    try {
+      setTransactions(newTransactions);
+      setBalance(newBalance);
+
+      await AsyncStorage.setItem('@amount', newBalance.toString());
+      await AsyncStorage.setItem('@transactions', JSON.stringify(newTransactions));
+
+      console.log('Transactions and balance saved successfully');
+    } catch (error) {
+      console.error('Error saving data to AsyncStorage', error);
+    }
   };
+
 
   return (
     <TransactionContext.Provider value={{ transactions, addTransaction, balance }}>
