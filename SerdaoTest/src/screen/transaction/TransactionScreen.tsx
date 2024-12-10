@@ -7,7 +7,7 @@ interface Props {
   navigation: any;
 }
 
-const TransactionScreen: React.FC<Props> = ({ navigation }) => {
+const TransactionScreen = (props: Props) => {
   const [amount, setAmount] = useState('');
   const [name, setName] = useState('');
   const [iban, setIban] = useState('');
@@ -21,7 +21,7 @@ const TransactionScreen: React.FC<Props> = ({ navigation }) => {
 
     const accountDetails = { name, iban };
     addTransaction(parseFloat(amount), accountDetails);
-    navigation.goBack();
+    props.navigation.goBack();
   };
 
   return (

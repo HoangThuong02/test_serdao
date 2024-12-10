@@ -13,7 +13,7 @@ interface Props {
   navigation: any;
 }
 
-const HomeScreen = ({ navigation }: Props): JSX.Element => {
+const HomeScreen = (props: Props): JSX.Element => {
   const { transactions, balance } = useTransactions();
 
   const renderItem = ({ item }: ListRenderItemInfo<typeof transactions[number]>) => (
@@ -28,10 +28,18 @@ const HomeScreen = ({ navigation }: Props): JSX.Element => {
   return (
     <View style={styles.container}>
       <Text style={styles.balanceText}>Current Balance: ${balance.toFixed(2)}</Text>
-      <Button
-        title="Add Transaction"
-        onPress={() => navigation.navigate('Transaction')}
-      />
+      <View style={styles.viewRowBtn}>
+        <Button
+          color={'green'}
+          title="Add Transaction"
+          onPress={() => props.navigation.navigate('Transaction')}
+        />
+        <Button
+          color={'orange'}
+          title="Add New Beneficiary"
+          onPress={() => props.navigation.navigate('Beneficiary')}
+        />
+      </View>
       {transactions.length > 0 ? (
         <FlatList
           data={transactions}
@@ -81,6 +89,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 20,
   },
+  viewRowBtn: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: 12,
+  }
 });
 
 export default HomeScreen;

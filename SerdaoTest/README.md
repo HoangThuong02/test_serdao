@@ -9,9 +9,10 @@ A significant challenge when working with React Native is setting up a complete 
 # Test
 
 You will be working on an application that facilitates transactions to beneficiaries. To successfully complete the test, you will need to implement the following features:
- - Introduce a new page to create a beneficiary, including fields for their first name, last name, and IBAN. Additionally, incorporate an IBAN validator to ensure the IBAN's validity.
- - Enable the selection of a beneficiary from a list when making a transaction.
- - Preserve the state of the application so that upon reopening, the list of beneficiaries, transaction history, and balance are retained.
+
+- Introduce a new page to create a beneficiary, including fields for their first name, last name, and IBAN. Additionally, incorporate an IBAN validator to ensure the IBAN's validity.
+- Enable the selection of a beneficiary from a list when making a transaction.
+- Preserve the state of the application so that upon reopening, the list of beneficiaries, transaction history, and balance are retained.
 
 Note: you have free rein in how you want to implement this test, give it you best shot!
 
@@ -20,3 +21,16 @@ Note: you have free rein in how you want to implement this test, give it you bes
 Please create a new Git repository to store both the test first version and your modifications. Document all the commands needed to install and launch this project, excluding the installation of any external SDKs/platforms, our focus will remain strictly on this project.
 
 We hope that you will enjoy taking this test, best of luck!
+
+# For testing
+
+IBAN follows the ISO 13616 IBAN Registry technical specification.
+
+Because I don't have IBAN for testing so I reference some IBAN on internet:
+
+GB82 WEST 1234 5698 7654 32
+GB29 NWBK 6016 1331 9268 19
+DE89 3704 0044 0532 0130 00
+BE68 5390 0754 7034
+
+You can also use some different ones but some may not work.
