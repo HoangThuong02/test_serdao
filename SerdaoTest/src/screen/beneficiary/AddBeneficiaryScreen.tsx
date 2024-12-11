@@ -62,7 +62,7 @@ const AddBeneficiaryScreen = (props: Props) => {
             const updatedData = [...parsedData, accountDetails];
 
             await AsyncStorage.setItem('@beneficiary', JSON.stringify(updatedData));
-            ToastAndroid.show(` 🎉🎉 Add new beneficiary successfully 🎉🎉`, ToastAndroid.SHORT);
+            ToastAndroid.show(` 🎉🎉 Beneficiary added successfully 🎉🎉`, ToastAndroid.SHORT);
 
             props.navigation.goBack();
         } catch (error) {
@@ -81,6 +81,7 @@ const AddBeneficiaryScreen = (props: Props) => {
                 value={firstName}
                 placeholder="First Name"
                 placeholderTextColor="#999"
+                maxLength={20}
             />
             <TextInput
                 style={styles.input}
@@ -88,23 +89,24 @@ const AddBeneficiaryScreen = (props: Props) => {
                 value={lastName}
                 placeholder="Last Name"
                 placeholderTextColor="#999"
+                maxLength={20}
             />
 
             <TextInput
-                style={[styles.input, ibanValid === false ? { borderColor: 'red' } : {}]}
+                style={[styles.input, ibanValid === false ? { borderColor: 'red' } : {}, { marginBottom: 20 }]}
                 onChangeText={handleIbanChange}
                 value={iban}
                 placeholder="IBAN"
                 placeholderTextColor="#999"
             />
             {/* Add simple mode for easy testing IBAN */}
-            <View style={styles.switchContainer}>
+            {/* <View style={styles.switchContainer}>
                 <Text>Use Simple IBAN Handling (For test easy)</Text>
                 <Switch
                     value={isSimpleMode}
                     onValueChange={setIsSimpleMode}
                 />
-            </View>
+            </View> */}
             {ibanValid === false && (
                 <Text style={styles.errorText}>IBAN is invalid. Please correct it.</Text>
             )}
@@ -112,6 +114,7 @@ const AddBeneficiaryScreen = (props: Props) => {
                 disabled={!firstName || !lastName || !iban ? true : false}
                 title="Add new beneficiary"
                 onPress={handleAddNew}
+                color={'#569F8B'}
             />
 
         </View>

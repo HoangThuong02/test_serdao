@@ -11,6 +11,10 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
+
+interface Props {
+    navigation: any;
+}
 interface Beneficiary {
     id: string;
     firstName: string;
@@ -18,7 +22,7 @@ interface Beneficiary {
     iban: string;
 }
 
-const DataBeneficiaryScreen: React.FC = () => {
+const DataBeneficiaryScreen = (props: Props) => {
     const [data, setData] = useState<Beneficiary[]>([]);
     const [searchText, setSearchText] = useState<string>('');
 
@@ -30,8 +34,6 @@ const DataBeneficiaryScreen: React.FC = () => {
         try {
             const storedData = await AsyncStorage.getItem('@beneficiary');
             if (storedData) {
-                console.log('JSON.parse(storedData)', JSON.parse(storedData));
-
                 setData(JSON.parse(storedData) as Beneficiary[]);
             }
         } catch (error) {
@@ -64,36 +66,43 @@ const DataBeneficiaryScreen: React.FC = () => {
         await AsyncStorage.setItem('@beneficiary', JSON.stringify(updatedData));
     };
 
+    const handleSelect = (beneficiary: Beneficiary) => {
+        props.navigation.navigate('Transaction', { beneficiary });
+    };
+
     const renderItem = ({ item }: { item: Beneficiary }): JSX.Element => (
-        <Swipeable
-            renderRightActions={() => (
-                <TouchableOpacity
-                    style={styles.deleteButton}
-                    onPress={() => confirmDelete(item)}
-                >
-                    <Text style={styles.deleteButtonText}>Delete</Text>
-                </TouchableOpacity>
-            )}
-        >
-            <View style={styles.itemContainer}>
-                <Text style={styles.itemText}>
-                    {item.firstName} {item.lastName}
-                </Text>
-                <Text style={styles.itemIBAN}>{item.iban}</Text>
-            </View>
-        </Swipeable>
+        <TouchableOpacity onPress={() => handleSelect(item)}>
+            <Swipeable
+                renderRightActions={() => (
+                    <TouchableOpacity
+                        style={styles.deleteButton}
+                        onPress={() => confirmDelete(item)}
+                    >
+                        <Text style={styles.deleteButtonText}>Delete</Text>
+                    </TouchableOpacity>
+                )}
+            >
+                <View style={styles.itemContainer}>
+                    <Text style={styles.itemText}>
+                        {item.firstName} {item.lastName}
+                    </Text>
+                    <Text style={styles.itemIBAN}>{item.iban}</Text>
+                </View>
+            </Swipeable>
+        </TouchableOpacity>
     );
 
     return (
         <View style={styles.container}>
             <TextInput
                 style={styles.searchInput}
-                placeholder="Search by name"
+                placeholder="Search by name 🔎"
                 value={searchText}
                 onChangeText={handleSearch}
             />
             <FlatList
                 data={filteredData}
+                showsVerticalScrollIndicator={false}
                 keyExtractor={(item) => item.id}
                 renderItem={renderItem}
                 ListEmptyComponent={<Text style={styles.emptyText}>No data found</Text>}

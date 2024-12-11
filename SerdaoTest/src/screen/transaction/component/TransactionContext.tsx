@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { Alert } from 'react-native';
+import { Alert, ToastAndroid } from 'react-native';
 
 interface AccountDetails {
   name: string;
@@ -53,7 +53,6 @@ export const TransactionProvider = ({ children }: TransactionProviderProps): JSX
           setBalance(1000);
           try {
             await AsyncStorage.setItem('@amount', '1000');
-            console.log('Amount saved successfully');
           } catch (error) {
             console.error('Error saving data', error);
           }
@@ -69,7 +68,7 @@ export const TransactionProvider = ({ children }: TransactionProviderProps): JSX
 
   const addTransaction = async (amount: number, account: AccountDetails): Promise<void> => {
     if (amount <= 0 || amount > balance) {
-      Alert.alert("Invalid transaction amount");
+      ToastAndroid.show(`Invalid transaction amount ❗`, ToastAndroid.SHORT);
       return;
     }
 
@@ -81,11 +80,8 @@ export const TransactionProvider = ({ children }: TransactionProviderProps): JSX
     try {
       setTransactions(newTransactions);
       setBalance(newBalance);
-
       await AsyncStorage.setItem('@amount', newBalance.toString());
       await AsyncStorage.setItem('@transactions', JSON.stringify(newTransactions));
-
-      console.log('Transactions and balance saved successfully');
     } catch (error) {
       console.error('Error saving data to AsyncStorage', error);
     }
