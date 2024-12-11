@@ -7,9 +7,9 @@ import {
   StyleSheet,
   ListRenderItemInfo,
 } from 'react-native';
-import { useTransactions } from '../transaction/component/TransactionContext';
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import { useTransactions } from '../transaction/hooks/useTransactions';
 
 interface Props {
   navigation: any;

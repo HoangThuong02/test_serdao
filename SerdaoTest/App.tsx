@@ -1,12 +1,13 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { TransactionProvider } from './src/screen/transaction/component/TransactionContext';
-import HomeScreen from './src/screen/home/HomeScreen';
-import TransactionScreen from './src/screen/transaction/TransactionScreen';
-import AddBeneficiaryScreen from './src/screen/beneficiary/AddBeneficiaryScreen';
-import DataBeneficiaryScreen from './src/screen/beneficiary/DataBeneficiaryScreen';
+import { TransactionProvider } from './src/context/TransactionContext';
+
+import TransactionScreen from './src/features/transaction/TransactionScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import HomeScreen from './src/features/home/HomeScreen';
+import AddBeneficiaryScreen from './src/features/beneficiary/AddBeneficiaryScreen';
+import DataBeneficiaryScreen from './src/features/beneficiary/DataBeneficiaryScreen';
 
 
 const Stack = createNativeStackNavigator();

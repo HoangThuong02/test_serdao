@@ -12,9 +12,7 @@ const AddBeneficiaryScreen = (props: Props) => {
     const [lastName, setLastName] = useState('');
     const [iban, setIban] = useState('');
     const [ibanValid, setIbanValid] = useState<boolean | null>(null);
-    const [isSimpleMode, setIsSimpleMode] = useState(false);
 
-    // Format IBAN 4 characters 😎
     const formatIban = (value: string) => {
         const cleanValue = value.replace(/\s/g, '');
         const formattedValue = cleanValue.match(/.{1,4}/g)?.join(' ') || '';
@@ -22,27 +20,12 @@ const AddBeneficiaryScreen = (props: Props) => {
     };
 
     const handleIbanChange = (text: string) => {
-        if (isSimpleMode) {
-            const cleanText = text.replace(/\s/g, '').toUpperCase();
-            const firstTwoChars = cleanText.slice(0, 2);
+        const formattedText = formatIban(text);
+        setIban(formattedText);
+        setIbanValid(IBAN.isValid(text));
 
-            if (/^[A-Z]{2}/.test(firstTwoChars)) {
-                const formattedText = formatIban(cleanText.slice(0, 34));
-                setIban(formattedText);
-                setIbanValid(true);
-            } else {
-                const formattedText = formatIban(cleanText);
-                setIban(formattedText);
-                setIbanValid(false);
-            }
-        } else {
-            const formattedText = formatIban(text);
-            setIban(formattedText);
-            setIbanValid(IBAN.isValid(text));
-        }
     };
 
-    // add new beneficiary and save it 😍
     const handleAddNew = async () => {
         if (!ibanValid) {
             ToastAndroid.show('Invalid IBAN. Please enter a valid one.', ToastAndroid.SHORT);
@@ -62,11 +45,11 @@ const AddBeneficiaryScreen = (props: Props) => {
             const updatedData = [...parsedData, accountDetails];
 
             await AsyncStorage.setItem('@beneficiary', JSON.stringify(updatedData));
-            ToastAndroid.show(` 🎉🎉 Beneficiary added successfully 🎉🎉`, ToastAndroid.SHORT);
+            ToastAndroid.show(`Beneficiary added successfully`, ToastAndroid.SHORT);
 
             props.navigation.goBack();
         } catch (error) {
-            ToastAndroid.show(`Error! Please try again ❗`, ToastAndroid.SHORT);
+            ToastAndroid.show(`Error! Please try again`, ToastAndroid.SHORT);
             console.error('Error saving data', error);
         }
     };
@@ -99,14 +82,6 @@ const AddBeneficiaryScreen = (props: Props) => {
                 placeholder="IBAN"
                 placeholderTextColor="#999"
             />
-            {/* Add simple mode for easy testing IBAN */}
-            {/* <View style={styles.switchContainer}>
-                <Text>Use Simple IBAN Handling (For test easy)</Text>
-                <Switch
-                    value={isSimpleMode}
-                    onValueChange={setIsSimpleMode}
-                />
-            </View> */}
             {ibanValid === false && (
                 <Text style={styles.errorText}>IBAN is invalid. Please correct it.</Text>
             )}

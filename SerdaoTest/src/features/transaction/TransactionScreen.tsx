@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet, Alert, TouchableOpacity, Switch, ToastAndroid } from 'react-native';
-import { useTransactions } from './component/TransactionContext';
+
 import Icon from 'react-native-vector-icons/FontAwesome';
 import IBAN from 'iban';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTransactions } from './hooks/useTransactions';
 
 interface Props {
   navigation: any;
@@ -17,13 +18,11 @@ const TransactionScreen = (props: Props) => {
   const [iban, setIban] = useState('');
   const { addTransaction } = useTransactions();
   const [ibanValid, setIbanValid] = useState<boolean | null>(null);
-  const [isSimpleMode, setIsSimpleMode] = useState(false);
 
   useEffect(() => {
     const loadBalance = async () => {
       try {
         const storedBalance = await AsyncStorage.getItem('@amount');
-        const storedTransactions = await AsyncStorage.getItem('@transactions');
 
         if (storedBalance) {
           setBalance(parseFloat(storedBalance));
@@ -53,7 +52,6 @@ const TransactionScreen = (props: Props) => {
     }
   }, [props.route.params?.beneficiary]);
 
-  // Format IBAN 4 characters 😎
   const formatIban = (value: string) => {
     const cleanValue = value.replace(/\s/g, '');
     const formattedValue = cleanValue.match(/.{1,4}/g)?.join(' ') || '';
@@ -61,33 +59,16 @@ const TransactionScreen = (props: Props) => {
   };
 
   const handleIbanChange = (text: string) => {
-    // When simple mode is on => first 2 characters must is text 😠
-    if (isSimpleMode) {
-      const cleanText = text.replace(/\s/g, '').toUpperCase();
-      const firstTwoChars = cleanText.slice(0, 2);
+    const formattedText = formatIban(text);
+    setIban(formattedText);
+    setIbanValid(IBAN.isValid(text));
 
-      if (/^[A-Z]{2}/.test(firstTwoChars)) {
-        // If the first two characters is text & length characters < 34
-        const formattedText = formatIban(cleanText.slice(0, 34));
-        setIban(formattedText);
-        setIbanValid(true);
-      } else {
-        const formattedText = formatIban(cleanText);
-        setIban(formattedText);
-        setIbanValid(false);
-      }
-    } else {
-      // When simple mode is off => use IBAN library 😛
-      const formattedText = formatIban(text);
-      setIban(formattedText);
-      setIbanValid(IBAN.isValid(text));
-    }
   };
 
   const handleTransaction = () => {
     const accountDetails = { name, iban };
     addTransaction(parseFloat(amount), accountDetails);
-    ToastAndroid.show(` 🎉🎉 The transaction was successful 🎉🎉`, ToastAndroid.SHORT);
+    ToastAndroid.show(`The transaction was successful`, ToastAndroid.SHORT);
     props.navigation.goBack();
   };
 
@@ -131,14 +112,6 @@ const TransactionScreen = (props: Props) => {
         placeholderTextColor="#999"
       />
 
-      {/* Add simple mode for easy testing IBAN 💕 */}
-      {/* <View style={styles.switchContainer}>
-        <Text>Use Simple IBAN Handling (For test easy)</Text>
-        <Switch
-          value={isSimpleMode}
-          onValueChange={setIsSimpleMode}
-        />
-      </View> */}
       {ibanValid === false && (
         <Text style={styles.errorText}>IBAN is invalid. Please correct it.</Text>
       )}

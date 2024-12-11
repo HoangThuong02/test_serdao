@@ -1,33 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
 import { Alert, ToastAndroid } from 'react-native';
+import { AccountDetails, Transaction, TransactionContextType } from '../features/transaction/types/transactionTypes';
 
-interface AccountDetails {
-  name: string;
-  iban: string;
-}
-
-interface Transaction {
-  id: number;
-  amount: number;
-  account: AccountDetails;
-}
-
-interface TransactionContextType {
-  transactions: Transaction[];
-  addTransaction: (amount: number, account: AccountDetails) => void;
-  balance: number;
-}
-
-const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
-
-export const useTransactions = (): TransactionContextType => {
-  const context = useContext(TransactionContext);
-  if (!context) {
-    throw new Error('useTransactions must be used within a TransactionProvider');
-  }
-  return context;
-};
+export const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
 
 interface TransactionProviderProps {
   children: ReactNode;
@@ -37,7 +13,6 @@ export const TransactionProvider = ({ children }: TransactionProviderProps): JSX
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [balance, setBalance] = useState<number>(1000);
 
-  // Get transaction & amount if exists 😁
   useEffect(() => {
     const loadBalance = async () => {
       try {
@@ -68,7 +43,7 @@ export const TransactionProvider = ({ children }: TransactionProviderProps): JSX
 
   const addTransaction = async (amount: number, account: AccountDetails): Promise<void> => {
     if (amount <= 0 || amount > balance) {
-      ToastAndroid.show(`Invalid transaction amount ❗`, ToastAndroid.SHORT);
+      ToastAndroid.show(`Invalid transaction amount`, ToastAndroid.SHORT);
       return;
     }
 
@@ -76,7 +51,6 @@ export const TransactionProvider = ({ children }: TransactionProviderProps): JSX
     const newBalance = balance - amount;
     const newTransactions = [...transactions, newTransaction];
 
-    // Save transaction & amount 💋
     try {
       setTransactions(newTransactions);
       setBalance(newBalance);
