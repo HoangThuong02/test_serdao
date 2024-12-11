@@ -35,7 +35,7 @@ interface TransactionProviderProps {
 
 export const TransactionProvider = ({ children }: TransactionProviderProps): JSX.Element => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [balance, setBalance] = useState<number>(0);
+  const [balance, setBalance] = useState<number>(1000);
 
   // Get transaction & amount if exists 😁
   useEffect(() => {
@@ -52,7 +52,7 @@ export const TransactionProvider = ({ children }: TransactionProviderProps): JSX
         } else {
           setBalance(1000);
           try {
-            await AsyncStorage.setItem('@amount', balance.toString());
+            await AsyncStorage.setItem('@amount', '1000');
             console.log('Amount saved successfully');
           } catch (error) {
             console.error('Error saving data', error);

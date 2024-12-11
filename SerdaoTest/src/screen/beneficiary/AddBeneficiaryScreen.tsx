@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, Text, TextInput, View, Button, ToastAndroid } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, View, Button, ToastAndroid, Switch } from 'react-native';
 import React, { useState } from 'react';
 import IBAN from 'iban';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,12 +7,12 @@ interface Props {
     navigation: any;
 }
 
-const BeneficiaryScreen = (props: Props) => {
+const AddBeneficiaryScreen = (props: Props) => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [iban, setIban] = useState('');
     const [ibanValid, setIbanValid] = useState<boolean | null>(null);
-
+    const [isSimpleMode, setIsSimpleMode] = useState(false);
 
     // Format IBAN 4 characters 😎
     const formatIban = (value: string) => {
@@ -22,29 +22,55 @@ const BeneficiaryScreen = (props: Props) => {
     };
 
     const handleIbanChange = (text: string) => {
-        const formattedText = formatIban(text);
-        setIban(formattedText);
-        setIbanValid(IBAN.isValid(text));
+        if (isSimpleMode) {
+            const cleanText = text.replace(/\s/g, '').toUpperCase();
+            const firstTwoChars = cleanText.slice(0, 2);
+
+            if (/^[A-Z]{2}/.test(firstTwoChars)) {
+                const formattedText = formatIban(cleanText.slice(0, 34));
+                setIban(formattedText);
+                setIbanValid(true);
+            } else {
+                const formattedText = formatIban(cleanText);
+                setIban(formattedText);
+                setIbanValid(false);
+            }
+        } else {
+            const formattedText = formatIban(text);
+            setIban(formattedText);
+            setIbanValid(IBAN.isValid(text));
+        }
     };
 
     // add new beneficiary and save it 😍
     const handleAddNew = async () => {
-
         if (!ibanValid) {
             ToastAndroid.show('Invalid IBAN. Please enter a valid one.', ToastAndroid.SHORT);
             return;
         }
 
-        const accountDetails = { firstName, lastName, iban };
         try {
-            await AsyncStorage.setItem('@beneficiary', JSON.stringify(accountDetails));
+            const storedData = await AsyncStorage.getItem('@beneficiary');
+            const parsedData = storedData ? JSON.parse(storedData) : [];
+
+            const newId = parsedData.length > 0
+                ? parsedData[parsedData.length - 1].id + 1
+                : 1;
+
+            const accountDetails = { id: newId, firstName, lastName, iban };
+
+            const updatedData = [...parsedData, accountDetails];
+
+            await AsyncStorage.setItem('@beneficiary', JSON.stringify(updatedData));
             ToastAndroid.show(` 🎉🎉 Add new beneficiary successfully 🎉🎉`, ToastAndroid.SHORT);
+
             props.navigation.goBack();
         } catch (error) {
             ToastAndroid.show(`Error! Please try again ❗`, ToastAndroid.SHORT);
             console.error('Error saving data', error);
         }
     };
+
 
     return (
         <View style={styles.container}>
@@ -63,6 +89,7 @@ const BeneficiaryScreen = (props: Props) => {
                 placeholder="Last Name"
                 placeholderTextColor="#999"
             />
+
             <TextInput
                 style={[styles.input, ibanValid === false ? { borderColor: 'red' } : {}]}
                 onChangeText={handleIbanChange}
@@ -70,6 +97,14 @@ const BeneficiaryScreen = (props: Props) => {
                 placeholder="IBAN"
                 placeholderTextColor="#999"
             />
+            {/* Add simple mode for easy testing IBAN */}
+            <View style={styles.switchContainer}>
+                <Text>Use Simple IBAN Handling (For test easy)</Text>
+                <Switch
+                    value={isSimpleMode}
+                    onValueChange={setIsSimpleMode}
+                />
+            </View>
             {ibanValid === false && (
                 <Text style={styles.errorText}>IBAN is invalid. Please correct it.</Text>
             )}
@@ -107,10 +142,15 @@ const styles = StyleSheet.create({
         marginVertical: 10,
         backgroundColor: '#fff',
     },
+    switchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 10,
+    },
     errorText: {
         color: 'red',
-        marginTop: 8,
+        marginVertical: 8,
     },
 });
 
-export default BeneficiaryScreen;
+export default AddBeneficiaryScreen;

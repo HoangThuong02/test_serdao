@@ -34,3 +34,5 @@ DE89 3704 0044 0532 0130 00
 BE68 5390 0754 7034
 
 You can also use some different ones but some may not work.
+
+I created simple mode IBAN for easy testing 😎
